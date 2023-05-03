@@ -3,6 +3,9 @@ import ttkbootstrap.dialogs
 from ttkbootstrap.constants import *
 import string
 import random
+import pyperclip
+from ttkbootstrap.tooltip import ToolTip
+
 
 def generate_password():
     # Create string of characters based on selected options
@@ -38,6 +41,18 @@ def confirm_quit():
         root.destroy()
 
 
+def copyPassword():
+    generatedPass = generated_password_label.cget("text")
+    if generatedPass:
+        generatedPass = generatedPass.split(":")[1]
+        try:
+            pyperclip.copy(generatedPass)
+        except Exception as e:
+            pass
+    else:
+        ttkbootstrap.dialogs.Messagebox.show_error("failed to copy password", "generated password not found", alert=True)
+
+
 root = ttk.Window(themename="superhero")
 root.geometry("650x450+400+100")
 root.title("Password Generator APP")
@@ -67,11 +82,11 @@ password_length_label = ttk.Label(root, text="Select password length", font=("he
 password_length_label.grid(row=3, column=0, padx=10, pady=10,columnspan=3)
 
 easy_radio = ttk.Radiobutton(root, text="Easy (6 Characters)", variable=password_length_var,
-                                 value="easy",bootstyle="success")
+                                 value="easy",bootstyle="info")
 medium_radio = ttk.Radiobutton(root, text="Medium (12 Characters)",
                                    variable=password_length_var, value="medium",bootstyle="success")
 hard_radio = ttk.Radiobutton(root, text="Hard (18 Characters)", variable=password_length_var,
-                                 value="hard",bootstyle="success")
+                                 value="hard",bootstyle="danger")
 
 easy_radio.grid(row=4, column=0, padx=10, pady=5, sticky=ttk.W)
 medium_radio.grid(row=4, column=1, padx=10, pady=5, sticky=ttk.W)
@@ -81,14 +96,17 @@ hard_radio.grid(row=5, column=0, padx=10, pady=5, sticky=ttk.W)
 generated_password_label = ttk.Label(root, text="", font=("Arial", 14), width=40,anchor=ttk.CENTER,bootstyle="danger")
 generated_password_label.grid(row=6, column=0, padx=5, pady=30,columnspan=4)
 
+# copy button
+copyButton = ttk.Button(root, text="Copy Password",bootstyle=("info","outline"),command=copyPassword)
+copyButton.grid(row=7, column=1, padx=10, pady=20,columnspan=1)
+ToolTip(copyButton, text="Copy Password to Clipboard",bootstyle=("warning","inverse"))
+
 # Buttons to generate or cancel password
 generate_button = ttk.Button(root, text="Generate",command=generate_password,bootstyle=(SUCCESS, OUTLINE))
 cancel_button = ttk.Button(root, text="Cancel", command=confirm_quit,bootstyle=(DANGER, OUTLINE))
 
-generate_button.grid(row=7, column=0, padx=10, pady=10)
-cancel_button.grid(row=7, column=1, padx=10, pady=10)
-
-
+generate_button.grid(row=7, column=0, padx=5, pady=10)
+cancel_button.grid(row=7, column=2, padx=15, pady=10,columnspan=1)
 
 
 root.mainloop()
